@@ -420,11 +420,15 @@
   background:#fff3cd;
   color:#856404;
 }
+
 .estado.pagado {
   background: #dcfce7;
   color: #15803d;
 }
-
+.estado.pagado {
+  background: #dcfce7;
+  color: #045321;
+}
 .estado.error {
   background: #fee2e2;
   color: #b91c1c;
