@@ -640,3 +640,13 @@ footer span {
 
     font-size: 10px;
 }
+.mensaje-error {
+  background-color: #fdecec;
+  color: #b42318;
+  border: 1px solid #f5c2c0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-align: center;
+}

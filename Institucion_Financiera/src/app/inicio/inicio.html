@@ -1,1 +1,194 @@
-<p>inicio works!</p>
+<header class="encabezado">
+  <div class="marca">
+    <div class="marca-grafica">
+      <span class="simbolo-dinero">Q</span>
+    </div>
+    <div class="marca-texto">
+      <h1>Institución <strong>Financiera</strong></h1>
+      <p>Plataforma de gestión financiera</p>
+    </div>
+  </div>
+
+  <div class="selector-entidad">
+    <label>Entidad</label>
+    <select [(ngModel)]="entidadSeleccionada" (ngModelChange)="cambiarEntidad()">
+      <option *ngFor="let entidad of entidades" [ngValue]="entidad">
+        {{ entidad.entidad }} - {{ entidad.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <div class="usuario-header">
+    <div class="datos-usuario">
+      <strong>{{ nombre }}</strong>
+      <span>{{ usuario }}</span>
+    </div>
+    <button type="button" class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</header>
+
+<main class="contenido">
+  <div class="titulo-pagina">
+    <h2>Solicitud de pago</h2>
+    <p>Registro y seguimiento de solicitudes de pago</p>
+  </div>
+
+  <div class="contenido-principal">
+    <div class="barra-acciones">
+      <button type="button" class="btn-nuevo" (click)="nuevaSolicitud()">+ Nueva solicitud</button>
+    </div>
+
+    <div class="modal-fondo" *ngIf="mostrarFormulario">
+      <div class="modal-solicitud">
+        <div class="modal-header">
+          <h3>{{ editando ? 'Editar solicitud' : 'Nueva solicitud de pago' }}</h3>
+          <button type="button" class="btn-cerrar-modal" (click)="cancelar()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="campo">
+              <label>Entidad</label>
+              <input type="text" [value]="solicitud.entidad" disabled>
+            </div>
+
+            <div class="campo">
+              <label>Unidad ejecutora</label>
+              <input type="text" [value]="solicitud.unidadEjecutora" disabled>
+            </div>
+
+            <div class="campo">
+              <label>Unidad desconcentrada</label>
+              <input type="text" [value]="solicitud.unidadDesconcentrada" disabled>
+            </div>
+
+            <div class="campo">
+              <label>Cuenta</label>
+              <select [(ngModel)]="solicitud.idCuenta">
+                <option [ngValue]="0">Seleccione una cuenta</option>
+                <option [ngValue]="1">Cuenta 001</option>
+                <option [ngValue]="2">Cuenta 002</option>
+              </select>
+            </div>
+
+            <div class="campo campo-completo">
+              <label>Descripción</label>
+              <textarea [(ngModel)]="solicitud.descripcion" maxlength="500"></textarea>
+            </div>
+
+            <div class="campo">
+              <label>Monto</label>
+              <input type="number" [(ngModel)]="solicitud.monto" min="0" step="0.01">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+          <button type="button" class="btn-guardar" (click)="guardarSolicitud()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table class="tabla-solicitudes">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Entidad</th>
+            <th>UE</th>
+            <th>Cuenta</th>
+            <th>Descripción</th>
+            <th>Monto</th>
+             <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of solicitudes">
+            <td>{{ item.idSolicitudPago }}</td>
+            <td>{{ item.entidad }}</td>
+            <td>{{ item.unidadEjecutora }}</td>
+            <td>{{ item.idCuenta }}</td>
+            <td>{{ item.descripcion }}</td>
+            <td>Q {{ item.monto | number:'1.2-2' }}</td>
+              <td>
+              <span class="estado" [ngClass]="item.estado?.toLowerCase()">
+                {{ item.estado }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button type="button" class="btn-editar" (click)="editarSolicitud(item)">Editar</button>
+              <button type="button"  class="btn-eliminar" [disabled]="item.estado ==='SOLICITADO' || item.estado === 'ERROR' || item.estado === 'PAGADO'" (click)="eliminarSolicitud(item.idSolicitudPago)">
+                Eliminar</button>
+                <button type="button" class="btn-solicitar"[disabled]="item.estado === 'SOLICITADO' || item.estado === 'ERROR' || item.estado === 'PAGADO'"  (click)="solicitarPago(item.idSolicitudPago)"> 
+                  Solicitar</button>
+               <button type="button" class="btn-historial" (click)="verHistorial(item.idSolicitudPago)">Ver historial</button>
+            </td>
+          </tr>
+
+          <tr *ngIf="solicitudes.length === 0">
+            <td colspan="7" class="sin-datos">No existen solicitudes registradas.</td>
+          </tr>
+
+           <div class="modal-fondo" *ngIf="mostrarHistorial">
+              <div class="modal-solicitud">
+                <div class="modal-header">
+                  <h3>Historial de la solicitud</h3>
+                  <button type="button" class="btn-cerrar-modal"
+                          (click)="cerrarHistorial()">×</button>
+                </div>
+
+                <div class="modal-body">
+
+                  <table class="tabla-solicitudes">
+                    <thead>
+                      <tr>
+                        <th>Estado</th>
+                        <th>Intento</th>
+                        <th>Fecha</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr *ngFor="let item of historial">
+                        <td>
+                          <span class="estado"
+                                [ngClass]="item.estado?.toLowerCase()">
+                            {{ item.estado }}
+                          </span>
+                        </td>
+
+                        <td>{{ item.numeroIntento }}</td>
+
+                        <td>
+                          {{ item.fecha | date:'dd/MM/yyyy HH:mm:ss' }}
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="historial.length === 0">
+                        <td colspan="3" class="sin-datos">
+                          No existe historial para esta solicitud.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button"
+                          class="btn-cancelar"
+                          (click)="cerrarHistorial()">
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
