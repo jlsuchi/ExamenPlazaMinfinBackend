@@ -1,0 +1,106 @@
+
+-- ============================================================
+-- INSERT DE DATOS 
+-- ============================================================
+
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 0, 0, NULL, 'MINISTERIO DE FINANZAS PÚBLICAS', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 201, 0, 11130007, 'DIRECCIÓN FINANCIERA', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 202, 0, 11130007, 'DIRECCIÓN DE RECURSOS HUMANOS', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 203, 0, 11130007, 'DIRECCIÓN DE TECNOLOGÍAS DE LA INFORMACIÓN', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 203, 1, 11130007, 'UNIDAD DESCONCENTRADA 1', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130007, 203, 2, 11130007, 'UNIDAD DESCONCENTRADA 2', TRUE);
+
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130009, 0, 0, NULL, 'MINISTERIO DE SALUD PÚBLICA Y ASISTENCIA SOCIAL', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130009, 208, 0, 11130009, 'UNIDAD EJECUTORA 208', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130009, 208, 1, 11130009, 'UNIDAD DESCONCENTRADA 1', TRUE);
+
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130016, 0, 0, NULL, 'SECRETARÍAS Y OTRAS DEPENDENCIAS DEL EJECUTIVO', TRUE);
+INSERT INTO entidad (entidad, unidad_ejecutora, unidad_desconcentrada, entidad_padre, nombre, estado) VALUES (11130016, 217, 0, 11130016, 'CONSEJO NACIONAL DE ÁREAS PROTEGIDAS', TRUE);
+
+INSERT INTO usuario (usuario, nombre, correo, password_hash, estado) VALUES ('admin', 'Administrador General', 'admin@portal.gob.gt', 'MTIzNEA=', TRUE);
+INSERT INTO usuario (usuario, nombre, correo, password_hash, estado) VALUES ('jperez', 'Juan Perez', 'jperez@portal.gob.gt', 'MTIzNEA=', TRUE);
+INSERT INTO usuario (usuario, nombre, correo, password_hash, estado) VALUES ('mlopez', 'Maria Lopez', 'mlopez@portal.gob.gt', 'MTIzNEA=', TRUE);
+INSERT INTO usuario (usuario, nombre, correo, password_hash, estado) VALUES ('cgarcia', 'Carlos Garcia', 'cgarcia@portal.gob.gt', 'MTIzNEA=', TRUE);
+
+
+
+INSERT INTO rol (nombre, descripcion, estado) VALUES ('ADMINISTRADOR', 'Administrador general del portal', TRUE);
+INSERT INTO rol (nombre, descripcion, estado) VALUES ('OPERADOR', 'Registra y consulta solicitudes de pago', TRUE);
+INSERT INTO rol (nombre, descripcion, estado) VALUES ('CONSULTA', 'Usuario con permisos únicamente de consulta', TRUE);
+
+
+
+
+INSERT INTO usuario_rol (id_usuario, id_rol) SELECT u.id_usuario, r.id_rol FROM usuario u, rol r WHERE u.usuario = 'admin' AND r.nombre = 'ADMINISTRADOR';
+INSERT INTO usuario_rol (id_usuario, id_rol) SELECT u.id_usuario, r.id_rol FROM usuario u, rol r WHERE u.usuario = 'jperez' AND r.nombre = 'OPERADOR';
+INSERT INTO usuario_rol (id_usuario, id_rol) SELECT u.id_usuario, r.id_rol FROM usuario u, rol r WHERE u.usuario = 'mlopez' AND r.nombre = 'OPERADOR';
+INSERT INTO usuario_rol (id_usuario, id_rol) SELECT u.id_usuario, r.id_rol FROM usuario u, rol r WHERE u.usuario = 'cgarcia' AND r.nombre = 'CONSULTA';
+
+
+INSERT INTO permiso (nombre, descripcion) VALUES ('REGISTRAR_SOLICITUD', 'Permite registrar solicitudes de pago');
+INSERT INTO permiso (nombre, descripcion) VALUES ('CONSULTAR_SOLICITUD', 'Permite consultar solicitudes de pago');
+INSERT INTO permiso (nombre, descripcion) VALUES ('ACTUALIZAR_SOLICITUD', 'Permite actualizar solicitudes de pago');
+INSERT INTO permiso (nombre, descripcion) VALUES ('ADMINISTRAR_USUARIOS', 'Permite administrar usuarios');
+INSERT INTO permiso (nombre, descripcion) VALUES ('ADMINISTRAR_CUENTAS', 'Permite administrar cuentas bancarias');
+
+
+
+
+-- ADMINISTRADOR
+INSERT INTO rol_permiso (id_rol, id_permiso) SELECT r.id_rol, p.id_permiso FROM rol r CROSS JOIN permiso p WHERE r.nombre = 'ADMINISTRADOR';
+
+-- OPERADOR
+INSERT INTO rol_permiso (id_rol, id_permiso) SELECT r.id_rol, p.id_permiso FROM rol r, permiso p WHERE r.nombre = 'OPERADOR' AND p.nombre = 'REGISTRAR_SOLICITUD';
+INSERT INTO rol_permiso (id_rol, id_permiso) SELECT r.id_rol, p.id_permiso FROM rol r, permiso p WHERE r.nombre = 'OPERADOR' AND p.nombre = 'CONSULTAR_SOLICITUD';
+INSERT INTO rol_permiso (id_rol, id_permiso) SELECT r.id_rol, p.id_permiso FROM rol r, permiso p WHERE r.nombre = 'OPERADOR' AND p.nombre = 'ACTUALIZAR_SOLICITUD';
+
+-- CONSULTA
+INSERT INTO rol_permiso (id_rol, id_permiso) SELECT r.id_rol, p.id_permiso FROM rol r, permiso p WHERE r.nombre = 'CONSULTA' AND p.nombre = 'CONSULTAR_SOLICITUD';
+
+
+
+
+-- ADMIN
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130007, 0, 0 FROM usuario WHERE usuario = 'admin';
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130009, 0, 0 FROM usuario WHERE usuario = 'admin';
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130016, 0, 0 FROM usuario WHERE usuario = 'admin';
+
+-- JPEREZ
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130007, 201, 0 FROM usuario WHERE usuario = 'jperez';
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130007, 202, 0 FROM usuario WHERE usuario = 'jperez';
+
+-- MLOPEZ
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130009, 208, 0 FROM usuario WHERE usuario = 'mlopez';
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130009, 208, 1 FROM usuario WHERE usuario = 'mlopez';
+
+-- CGARCIA
+INSERT INTO usuario_acceso (id_usuario, entidad, unidad_ejecutora, unidad_desconcentrada) SELECT id_usuario, 11130016, 217, 0 FROM usuario WHERE usuario = 'cgarcia';
+
+
+
+
+INSERT INTO banco (codigo, nombre, estado) VALUES ('BANRURAL', 'Banco de Desarrollo Rural', TRUE);
+INSERT INTO banco (codigo, nombre, estado) VALUES ('BI', 'Banco Industrial', TRUE);
+INSERT INTO banco (codigo, nombre, estado) VALUES ('GTC', 'Banco G&T Continental', TRUE);
+
+
+
+INSERT INTO cuenta_bancaria (id_banco, numero_cuenta, nombre_cuenta, moneda, estado) SELECT id_banco, '100001001', 'Cuenta Pagos Principal', 'GTQ', TRUE FROM banco WHERE codigo = 'BANRURAL';
+INSERT INTO cuenta_bancaria (id_banco, numero_cuenta, nombre_cuenta, moneda, estado) SELECT id_banco, '100001002', 'Cuenta Pagos Secundaria', 'GTQ', TRUE FROM banco WHERE codigo = 'BANRURAL';
+INSERT INTO cuenta_bancaria (id_banco, numero_cuenta, nombre_cuenta, moneda, estado) SELECT id_banco, '200001001', 'Cuenta Institucional BI', 'GTQ', TRUE FROM banco WHERE codigo = 'BI';
+INSERT INTO cuenta_bancaria (id_banco, numero_cuenta, nombre_cuenta, moneda, estado) SELECT id_banco, '300001001', 'Cuenta Institucional GTC', 'GTQ', TRUE FROM banco WHERE codigo = 'GTC';
+
+
+
+INSERT INTO solicitud_pago (entidad, unidad_ejecutora, unidad_desconcentrada, id_usuario, id_cuenta, descripcion, monto, estado) SELECT 11130007, 201, 0, u.id_usuario, c.id_cuenta, 'Pago de servicios administrativos', 15000.00, 'REGISTRADO' FROM usuario u CROSS JOIN cuenta_bancaria c WHERE u.usuario = 'jperez' AND c.numero_cuenta = '100001001';
+
+INSERT INTO solicitud_pago (entidad, unidad_ejecutora, unidad_desconcentrada, id_usuario, id_cuenta, descripcion, monto, estado) SELECT 11130007, 202, 0, u.id_usuario, c.id_cuenta, 'Pago a proveedor', 25000.00, 'REGISTRADO' FROM usuario u CROSS JOIN cuenta_bancaria c WHERE u.usuario = 'jperez' AND c.numero_cuenta = '200001001';
+
+INSERT INTO solicitud_pago (entidad, unidad_ejecutora, unidad_desconcentrada, id_usuario, id_cuenta, descripcion, monto, estado) SELECT 11130009, 208, 0, u.id_usuario, c.id_cuenta, 'Pago de servicios generales', 48500.00, 'REGISTRADO' FROM usuario u CROSS JOIN cuenta_bancaria c WHERE u.usuario = 'mlopez' AND c.numero_cuenta = '100001002';
+
+INSERT INTO solicitud_pago (entidad, unidad_ejecutora, unidad_desconcentrada, id_usuario, id_cuenta, descripcion, monto, estado) SELECT 11130009, 208, 1, u.id_usuario, c.id_cuenta, 'Pago unidad desconcentrada', 12750.50, 'REGISTRADO' FROM usuario u CROSS JOIN cuenta_bancaria c WHERE u.usuario = 'mlopez' AND c.numero_cuenta = '300001001';
+
+INSERT INTO solicitud_pago (entidad, unidad_ejecutora, unidad_desconcentrada, id_usuario, id_cuenta, descripcion, monto, estado) SELECT 11130016, 217, 0, u.id_usuario, c.id_cuenta, 'Pago institucional', 75000.00, 'REGISTRADO' FROM usuario u CROSS JOIN cuenta_bancaria c WHERE u.usuario = 'cgarcia' AND c.numero_cuenta = '100001001';
+
+
+
