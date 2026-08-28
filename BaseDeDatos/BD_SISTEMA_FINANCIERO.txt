@@ -1,0 +1,202 @@
+
+
+CREATE TABLE entidad (
+    entidad BIGINT NOT NULL,
+    unidad_ejecutora INTEGER NOT NULL,
+    unidad_desconcentrada INTEGER NOT NULL DEFAULT 0,
+
+    entidad_padre BIGINT,
+
+    nombre VARCHAR(200) NOT NULL,
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
+
+    PRIMARY KEY (
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    )
+);
+
+
+
+CREATE TABLE usuario (
+    id_usuario BIGSERIAL PRIMARY KEY,
+
+    usuario VARCHAR(100) NOT NULL UNIQUE,
+    nombre VARCHAR(200) NOT NULL,
+    correo VARCHAR(200),
+
+    password_hash VARCHAR(500),
+
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+CREATE TABLE rol (
+    id_rol BIGSERIAL PRIMARY KEY,
+
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion VARCHAR(300),
+
+    estado BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+
+
+CREATE TABLE usuario_rol (
+    id_usuario BIGINT NOT NULL,
+    id_rol BIGINT NOT NULL,
+
+    PRIMARY KEY (
+        id_usuario,
+        id_rol
+    ),
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario),
+
+    FOREIGN KEY (id_rol)
+        REFERENCES rol(id_rol)
+);
+
+
+
+CREATE TABLE usuario_acceso (
+    id_usuario_acceso BIGSERIAL PRIMARY KEY,
+
+    id_usuario BIGINT NOT NULL,
+
+    entidad BIGINT NOT NULL,
+    unidad_ejecutora INTEGER NOT NULL,
+    unidad_desconcentrada INTEGER NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario),
+
+    FOREIGN KEY (
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    )
+    REFERENCES entidad (
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    ),
+
+    UNIQUE (
+        id_usuario,
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    )
+);
+
+
+CREATE TABLE permiso (
+    id_permiso BIGSERIAL PRIMARY KEY,
+
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion VARCHAR(300)
+);
+
+
+CREATE TABLE rol_permiso (
+    id_rol BIGINT NOT NULL,
+    id_permiso BIGINT NOT NULL,
+
+    PRIMARY KEY (
+        id_rol,
+        id_permiso
+    ),
+
+    FOREIGN KEY (id_rol)
+        REFERENCES rol(id_rol),
+
+    FOREIGN KEY (id_permiso)
+        REFERENCES permiso(id_permiso)
+);
+
+
+CREATE TABLE banco (
+    id_banco BIGSERIAL PRIMARY KEY,
+
+    codigo VARCHAR(20) NOT NULL UNIQUE,
+    nombre VARCHAR(200) NOT NULL,
+
+    estado BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+
+
+CREATE TABLE cuenta_bancaria (
+    id_cuenta BIGSERIAL PRIMARY KEY,
+
+    id_banco BIGINT NOT NULL,
+
+    numero_cuenta VARCHAR(100) NOT NULL,
+    nombre_cuenta VARCHAR(200),
+
+    moneda VARCHAR(10) NOT NULL DEFAULT 'GTQ',
+
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
+
+    FOREIGN KEY (id_banco)
+        REFERENCES banco(id_banco),
+
+    UNIQUE (
+        id_banco,
+        numero_cuenta
+    )
+);
+
+
+CREATE TABLE solicitud_pago (
+    id_solicitud_pago BIGSERIAL PRIMARY KEY,
+
+    entidad BIGINT NOT NULL,
+    unidad_ejecutora INTEGER NOT NULL,
+    unidad_desconcentrada INTEGER NOT NULL DEFAULT 0,
+
+    id_usuario BIGINT NOT NULL,
+    id_cuenta BIGINT NOT NULL,
+
+    descripcion VARCHAR(500),
+    monto NUMERIC(18,2) NOT NULL,
+
+    estado VARCHAR(30) NOT NULL DEFAULT 'REGISTRADO',
+
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP,
+
+    FOREIGN KEY (
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    )
+    REFERENCES entidad (
+        entidad,
+        unidad_ejecutora,
+        unidad_desconcentrada
+    ),
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id_usuario),
+
+    FOREIGN KEY (id_cuenta)
+        REFERENCES cuenta_bancaria(id_cuenta)
+);
+
+
+CREATE TABLE solicitud_pago_historial (
+    id_historial BIGSERIAL PRIMARY KEY,
+    id_solicitud_pago BIGINT NOT NULL,
+    numero_intento INTEGER NOT NULL DEFAULT 1,
+    estado VARCHAR(50) NOT NULL,
+    detalle VARCHAR(500),
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_solicitud_pago_historial FOREIGN KEY (id_solicitud_pago) REFERENCES solicitud_pago(id_solicitud_pago)
+);

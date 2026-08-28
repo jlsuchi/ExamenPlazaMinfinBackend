@@ -441,6 +441,14 @@
   border-radius: 6px;
   cursor: pointer;
 }
+.btn-solicitar2 {
+  border: none;
+  background-color: #198754;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
 .btn-solicitar:hover {
   background-color: #157347;
