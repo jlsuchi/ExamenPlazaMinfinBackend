@@ -38,7 +38,7 @@ builder.Services.AddScoped<ISolicitudPago, SolicitudPagoServicio>();
 builder.Services.AddScoped<ISolicitudPagoRepo, SolicitudPagoRepo>();
 builder.Services.AddScoped<IRabbitMQ, RabbitMQServicio>();
 
-// permitir Angular
+// permitir Angular CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirAngular",

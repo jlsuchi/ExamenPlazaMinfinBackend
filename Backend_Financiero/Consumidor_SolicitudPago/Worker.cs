@@ -96,7 +96,7 @@ namespace Consumidor_SolicitudPago
                     //throw new Exception("ERROR DE PRUEBA PARA ENVIAR A DLQ");
 
 
-                    // Aquí iría la llamada real al banco, SOAP, API externa, etc.
+                    // aca ejecutaria el proceso, pero ya no hay tiempo D: D:
                     bool resultadoPago = await solicitudRepo.SolicitarPago(idSolicitudPago, "PAGADO");
 
                     if (!resultadoPago)

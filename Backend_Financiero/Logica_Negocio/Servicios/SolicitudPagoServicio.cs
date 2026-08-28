@@ -80,6 +80,8 @@ namespace Logica_Negocio.Servicios
             // Si la operación en BD fue correcta, encolamos el ID.
             await _rabbitMQ.EncolarSolicitudPago(idSolicitudPago);
 
+            bool resultadoR = await _solicitudRepo.SolicitarPago(idSolicitudPago, "EN_COLA");
+
             return true;
         }
 
